@@ -14,7 +14,7 @@ class User(db.Model):
     sessions = db.relationship('Session', backref='user')
 
     @classmethod
-    def get_by_user(cls, username):
+    def get_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
 
     @classmethod
