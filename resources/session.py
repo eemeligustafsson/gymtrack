@@ -96,13 +96,13 @@ class SessionResource(Resource):
         if current_user != session.user_id:
             return {'message': 'Access to this session is not allowed'}, HTTPStatus.FORBIDDEN
 
-        session.description = json_data['description']
-        session.lengthInMinutes = json_data['description']
-        session.stepsTaken = json_data['stepsTaken']
-        session.pushUps = json_data['pushUps']
-        session.pullUps = json_data['pullUps']
-        session.otherExercises = json_data['otherExercises']
-        session.bodyWeightInKG = json_data['bodyWeightInKG']
+        session.description = data.get('description') or session.description
+        session.lengthInMinutes = data.get('lengthInMinutes') or session.lengthInMinutes
+        session.stepsTaken = data.get('stepsTaken') or session.stepsTaken
+        session.pushUps = data.get('pushUps') or session.pushUps
+        session.pullUps = data.get('pullUps') or session.pullUps
+        session.otherExercises = data.get('otherExercises') or session.otherExercises
+        session.bodyWeightInKG = data.get('bodyWeightInKG') or session.bodyWeightInKG
 
         session.save()
         return session_schema.dump(session), HTTPStatus.OK

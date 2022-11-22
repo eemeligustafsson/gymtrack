@@ -17,7 +17,7 @@ class Session(db.Model):
     user_id = db.Column(db.Integer(), db.ForeignKey("user.id"))
 
     @classmethod
-    def get_all_sessions(cls):
+    def get_all_published(cls):
         return cls.query.filter_by(is_public=True).all()
 
     @classmethod

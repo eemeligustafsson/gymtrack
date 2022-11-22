@@ -8,7 +8,6 @@ from webargs.flaskparser import use_kwargs
 
 from models.session import Session
 
-from schemas.user import UserSchema
 from schemas.session import SessionSchema
 
 from utils import hash_password
