@@ -10,7 +10,6 @@ from models.session import Session
 
 from schemas.session import SessionSchema
 
-from utils import hash_password
 from models.user import User
 from schemas.user import UserSchema
 
@@ -60,6 +59,27 @@ class UserResource(Resource):
 
         return data, HTTPStatus.OK
 
+    @jwt_required(optional=True)
+    def patch(self, user_id):
+        user = User.get_by_id(user_id=user_id)
+
+        json_data = request.get_json()
+        data = user_schema.load(data=json_data, partial=('name',))
+
+        if User is None:
+            return {'message': 'Session with such id not found'}, HTTPStatus.NOT_FOUND
+        current_user = get_jwt_identity()
+        if current_user != user.user_id:
+            return {'message': 'Access to this user is not allowed'}, HTTPStatus.FORBIDDEN
+
+        user.username = data.get('username') or user.username
+        user.email = data.get('email') or user.email
+        user.password = data.get('password') or user.password
+        user.session_count = data.get('session_count') or user.session_count
+        user.is_active = data.get('is_active') or user.is_active
+        user.save()
+        return user_schema.dump(user), HTTPStatus.OK
+
 
 class MeResource(Resource):
 
@@ -72,7 +92,7 @@ class MeResource(Resource):
 class UserSessionListResource(Resource):
 
     @jwt_required(optional=True)
-    @use_kwargs({'visibility': fields.Str(missing='public')})
+    #@use_kwargs({'visibility': fields.Str(missing='public')})
     def get(self, username, visibility):
 
         user = User.get_by_username(username=username)
@@ -81,11 +101,13 @@ class UserSessionListResource(Resource):
             return {'message': 'User not found'}, HTTPStatus.NOT_FOUND
 
         current_user = get_jwt_identity()
-
+        print(visibility)
         if current_user == user.id and visibility in ['all', 'private']:
             pass
         else:
             visibility = 'public'
+        print(visibility)
+
 
         sessions = Session.get_all_by_user(user_id=user.id, visibility=visibility)
 

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 061920ecd831
+Revision ID: 037facacb993
 Revises: 
-Create Date: 2022-11-22 15:37:57.157495
+Create Date: 2022-12-05 17:25:54.178896
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '061920ecd831'
+revision = '037facacb993'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,14 +33,14 @@ def upgrade():
     op.create_table('session',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('description', sa.String(length=1000), nullable=True),
-    sa.Column('lengthInMinutes', sa.Integer(), nullable=True),
-    sa.Column('stepsTaken', sa.Integer(), nullable=True),
-    sa.Column('pushUps', sa.Integer(), nullable=True),
-    sa.Column('pullUps', sa.Integer(), nullable=True),
-    sa.Column('otherExercises', sa.String(length=1000), nullable=True),
-    sa.Column('bodyWeightInKG', sa.Integer(), nullable=True),
-    sa.Column('is_publish', sa.Boolean(), nullable=True),
+    sa.Column('length', sa.Integer(), nullable=True),
     sa.Column('date', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('walking_distance', sa.Integer(), nullable=True),
+    sa.Column('running_distance', sa.Integer(), nullable=True),
+    sa.Column('steps', sa.Integer(), nullable=True),
+    sa.Column('other_exercises', sa.String(length=1000), nullable=True),
+    sa.Column('bodyweight', sa.Integer(), nullable=True),
+    sa.Column('is_publish', sa.Boolean(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),

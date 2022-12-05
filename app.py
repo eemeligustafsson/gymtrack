@@ -8,7 +8,7 @@ from extensions import db, jwt
 
 from resources.user import UserListResource, UserResource, MeResource, UserSessionListResource
 from resources.token import TokenResource, RefreshResource, RevokeResource, black_list
-from resources.session import SessionListResource, SessionResource, SessionPublishResource
+from resources.session import SessionListResource, SessionResource, SessionPublishResource, SessionAvgLengthResource
 
 
 def create_app():
@@ -48,7 +48,9 @@ def register_resources(app):
     api.add_resource(SessionResource, '/sessions/<int:session_id>')
     api.add_resource(SessionPublishResource, '/sessions/<int:session_id>/publish')
 
-    api.add_resource(UserSessionListResource, '/users/<string:username>/sessions')
+    api.add_resource(SessionAvgLengthResource, '/useraverage/<int:user_id>')
+
+    api.add_resource(UserSessionListResource, '/users/<string:username>/sessions/<string:visibility>')
 
 if __name__ == '__main__':
     app = create_app()

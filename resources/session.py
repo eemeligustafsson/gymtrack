@@ -4,6 +4,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from http import HTTPStatus
 
 from models.session import Session
+from models.user import User
 from schemas.session import SessionSchema
 
 session_schema = SessionSchema()
@@ -24,16 +25,27 @@ class SessionListResource(Resource):
 
         current_user = get_jwt_identity()
 
+        user = User.get_by_id(current_user)
         #data, errors = recipe_schema.load(data=json_data)
         data = session_schema.load(data=json_data)
         #if errors:
             #return {'message': "validation errors", 'error': errors}, HTTPStatus.BAD_REQUEST
 
+
+        user.session_count += 1
+        user.save()
         session = Session(**data)
         session.user_id = current_user
+
         session.save()
 
         return session_schema.dump(session), HTTPStatus.CREATED
+
+class SessionAvgLengthResource(Resource):
+    @jwt_required(optional=False)
+    def get(self, user_id):
+        average = Session.get_avg_length_by_user(user_id)
+        return average, HTTPStatus.OK
 
 
 class SessionResource(Resource):
@@ -69,12 +81,12 @@ class SessionResource(Resource):
             return {'message': 'Access to view this session is not allowed'}, HTTPStatus.FORBIDDEN
 
         session.description = json_data['description']
-        session.lengthInMinutes = json_data['description']
-        session.stepsTaken = json_data['stepsTaken']
-        session.pushUps = json_data['pushUps']
-        session.pullUps = json_data['pullUps']
-        session.otherExercises = json_data['otherExercises']
-        session.bodyWeightInKG = json_data['bodyWeightInKG']
+        session.length = json_data['length']
+        session.walking_distance = json_data['walking_distance']
+        session.running_distance = json_data['running_distance']
+        session.steps = json_data['steps']
+        session.other_exercises = json_data['other_exercises']
+        session.bodyweight = json_data['bodyweight']
 
         session.save()
 
@@ -97,12 +109,12 @@ class SessionResource(Resource):
             return {'message': 'Access to this session is not allowed'}, HTTPStatus.FORBIDDEN
 
         session.description = data.get('description') or session.description
-        session.lengthInMinutes = data.get('lengthInMinutes') or session.lengthInMinutes
-        session.stepsTaken = data.get('stepsTaken') or session.stepsTaken
-        session.pushUps = data.get('pushUps') or session.pushUps
-        session.pullUps = data.get('pullUps') or session.pullUps
-        session.otherExercises = data.get('otherExercises') or session.otherExercises
-        session.bodyWeightInKG = data.get('bodyWeightInKG') or session.bodyWeightInKG
+        session.length = data.get('length') or session.length
+        session.walking_distance = data.get('walking_distance') or session.walking_distance
+        session.running_distance = data.get('running_distance') or session.running_distance
+        session.steps = data.get('steps') or session.steps
+        session.other_exercises = data.get('other_exercises') or session.other_exercises
+        session.bodyweight = data.get('bodyweight') or session.bodyweight
 
         session.save()
         return session_schema.dump(session), HTTPStatus.OK
@@ -123,6 +135,7 @@ class SessionResource(Resource):
         session.delete()
 
         return {}, HTTPStatus.NO_CONTENT
+
 
 class SessionPublishResource(Resource):
 
