@@ -2,6 +2,7 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_restful import Api
 
+from models.exercise import Exercise
 from config import Config
 from extensions import db, jwt
 
@@ -9,6 +10,7 @@ from extensions import db, jwt
 from resources.user import UserListResource, UserResource, MeResource, UserSessionListResource
 from resources.token import TokenResource, RefreshResource, RevokeResource, black_list
 from resources.session import SessionListResource, SessionResource, SessionPublishResource, SessionAvgLengthResource
+from resources.exercise import ExerciseListResource
 
 
 def create_app():
@@ -17,6 +19,7 @@ def create_app():
 
     register_extensions(app)
     register_resources(app)
+
 
     return app
 
@@ -51,6 +54,8 @@ def register_resources(app):
     api.add_resource(SessionAvgLengthResource, '/useraverage/<int:user_id>')
 
     api.add_resource(UserSessionListResource, '/users/<string:username>/sessions/<string:visibility>')
+
+    api.add_resource(ExerciseListResource, '/exercises')
 
 if __name__ == '__main__':
     app = create_app()
