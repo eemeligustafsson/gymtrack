@@ -14,19 +14,20 @@ from models.user import User
 from schemas.user import UserSchema
 
 user_schema = UserSchema()
-user_public_schema = UserSchema(exclude=('email', ))
+user_public_schema = UserSchema(exclude=('email',))
 session_list_schema = SessionSchema(many=True)
+
 
 class UserListResource(Resource):
     def post(self):
 
         json_data = request.get_json()
 
-        #data, errors = user_schema.load(data=json_data)
+        # data, errors = user_schema.load(data=json_data)
         data = user_schema.load(data=json_data)
 
-        #if errors:
-            #return {'message': 'Validation errors', 'errors': errors}, HTTPStatus.BAD_REQUEST
+        # if errors:
+        # return {'message': 'Validation errors', 'errors': errors}, HTTPStatus.BAD_REQUEST
 
         if User.get_by_username(data.get('username')):
             return {'message': 'username already used'}, HTTPStatus.BAD_REQUEST
@@ -41,24 +42,6 @@ class UserListResource(Resource):
 
 
 class UserResource(Resource):
-
-    @jwt_required(optional=True)
-    def get(self, username):
-
-        user = User.get_by_username(username=username)
-
-        if user is None:
-            return {'message': 'User not found'}, HTTPStatus.NOT_FOUND
-
-        current_user = get_jwt_identity()
-
-        if current_user == user.id:
-            data = user_schema.dump(user)
-        else:
-            data = user_public_schema.dump(user)
-
-        return data, HTTPStatus.OK
-
     @jwt_required(optional=True)
     def patch(self, user_id):
         user = User.get_by_id(user_id=user_id)
@@ -89,10 +72,11 @@ class MeResource(Resource):
 
         return user_schema.dump(user), HTTPStatus.OK
 
+
 class UserSessionListResource(Resource):
 
-    @jwt_required(optional=True)
-    #@use_kwargs({'visibility': fields.Str(missing='public')})
+    @jwt_required(optional=False)
+    @use_kwargs({'visibility': fields.Str(missing='private')})
     def get(self, username, visibility):
 
         user = User.get_by_username(username=username)
@@ -107,7 +91,6 @@ class UserSessionListResource(Resource):
         else:
             visibility = 'public'
         print(visibility)
-
 
         sessions = Session.get_all_by_user(user_id=user.id, visibility=visibility)
 

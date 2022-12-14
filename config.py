@@ -1,7 +1,7 @@
 class Config:
     DEBUG = True
 
-    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://tester:kissa1234@localhost:5432/gymtracker'
+    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://gymtrackadmin:kissa1234@localhost:5432/gymtrack'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     SECRET_KEY = 'super-secret-key'

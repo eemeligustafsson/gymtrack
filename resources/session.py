@@ -12,11 +12,12 @@ session_list_schema = SessionSchema(many=True)
 
 
 class SessionListResource(Resource):
-
+    @jwt_required(optional=False)
     def get(self):
+        current_user = get_jwt_identity()
+        user = User.get_by_id(current_user)
 
-        sessions = Session.get_all_published()
-
+        sessions = Session.get_all_by_user(user_id=user.id, visibility='private')
         return session_list_schema.dump(sessions), HTTPStatus.OK
 
     @jwt_required(optional=False)
@@ -41,16 +42,10 @@ class SessionListResource(Resource):
 
         return session_schema.dump(session), HTTPStatus.CREATED
 
-class SessionAvgLengthResource(Resource):
-    @jwt_required(optional=False)
-    def get(self, user_id):
-        average = Session.get_avg_length_by_user(user_id)
-        return average, HTTPStatus.OK
-
 
 class SessionResource(Resource):
 
-    @jwt_required(optional=True)
+    @jwt_required(optional=False)
     def get(self, session_id):
 
         session = Session.get_by_id(session_id=session_id)
@@ -63,34 +58,8 @@ class SessionResource(Resource):
         if session.is_publish == False and session.user_id != current_user:
             return {'message': 'Access to view this session is not allowed'}, HTTPStatus.FORBIDDEN
 
-        return session.data(), HTTPStatus.OK
+        return session_schema.dump(session), HTTPStatus.OK
 
-    @jwt_required(optional=False)
-    def put(self, session_id):
-
-        json_data = request.get_json()
-
-        session = Session.get_by_id(session_id=session_id)
-
-        if session is None:
-            return {'message': 'Session with such id not found'}, HTTPStatus.NOT_FOUND
-
-        current_user = get_jwt_identity()
-
-        if current_user != session.user_id:
-            return {'message': 'Access to view this session is not allowed'}, HTTPStatus.FORBIDDEN
-
-        session.description = json_data['description']
-        session.length = json_data['length']
-        session.walking_distance = json_data['walking_distance']
-        session.running_distance = json_data['running_distance']
-        session.steps = json_data['steps']
-        session.other_exercises = json_data['other_exercises']
-        session.bodyweight = json_data['bodyweight']
-
-        session.save()
-
-        return session.data(), HTTPStatus.OK
 
     @jwt_required(optional=False)
     def patch(self, session_id):
