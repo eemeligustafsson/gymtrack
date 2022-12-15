@@ -18,9 +18,7 @@ def create_app():
     register_extensions(app)
     register_resources(app)
 
-
     return app
-
 
 def register_extensions(app):
     db.init_app(app)
@@ -32,7 +30,6 @@ def register_extensions(app):
         jti = jwt_payload['jti']
         return jti in black_list
 
-
 def register_resources(app):
     api = Api(app)
 
@@ -43,9 +40,10 @@ def register_resources(app):
     api.add_resource(RevokeResource, '/revoke')
     api.add_resource(SessionListResource, '/sessions')
     api.add_resource(SessionResource, '/sessions/<int:session_id>')
-    api.add_resource(SessionPublishResource, '/sessions/<int:session_id>/publish')
-    api.add_resource(UserSessionListResource, '/users/<string:username>/sessions')
     api.add_resource(ExerciseListResource, '/exercises')
+
+    #api.add_resource(UserSessionListResource, '/users/<string:username>/sessions')
+    #api.add_resource(SessionPublishResource, '/sessions/<int:session_id>/publish')
 
 if __name__ == '__main__':
     app = create_app()
